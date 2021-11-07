@@ -1,53 +1,99 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import axios from "axios";
+import moment from "moment";
 
-const ContactForm = ({ handleSubmit }) => {
+const ContactForm = () => {
   // have a validated state
+  const [error, setError] = useState("");
+  const [hasError, setHasError] = useState(false);
+  const [validated, setValidated] = useState(false);
   const [formName, setFormName] = useState("");
   const [formEmail, setFormEmail] = useState("");
-  const [formDoa, setFormDoa] = useState(new Date());
+  const [formDoa, setFormDoa] = useState(moment().format("MMMM Do YY"));
   const [formAboutYou, setFormAboutYou] = useState("");
   const [formReasonForApplying, setFormReasonForApplying] = useState("");
   const [formKnowAboutPavers, setFormKnowAboutPavers] = useState("");
   const [formProfilePicture, setFormProfilePicture] = useState("");
   const [submitForm, setSubmitForm] = useState({});
 
+  const validateForm = () => {
+    const baseDate = new Date();
+    if (formName.length <= 0) {
+      setHasError(true);
+      return false;
+    }
+    if (formEmail.length <= 0) {
+      setHasError(true);
+      return false;
+    }
+    if (formDoa.length === baseDate) {
+      setHasError(true);
+      return false;
+    }
+    if (formAboutYou.length <= 0) {
+      setHasError(true);
+      return false;
+    }
+    if (formReasonForApplying.length <= 0) {
+      setHasError(true);
+      return false;
+    }
+    if (formKnowAboutPavers.length <= 0) {
+      setHasError(true);
+      return false;
+    }
+
+    return true;
+  };
+
   const handleOnSubmit = (event) => {
-    // axios post data
-    // https://stackoverflow.com/questions/47630163/axios-post-request-to-send-form-data
     event.preventDefault();
+    event.stopPropagation();
+    setValidated(true);
 
-    setSubmitForm({
-      applicantName: formName,
-      applicantEmail: formEmail,
-      dateOfApplication: formDoa,
-      aboutYou: formAboutYou,
-      reasonForApplying: formReasonForApplying,
-      whatYouKnowAboutPavers: formKnowAboutPavers,
-      file: formProfilePicture,
-    });
-
-    axios
-      .post("https://staging.interview-api.paversdev.co.uk/upload", submitForm)
-      .then((res) => {
-        console.log(res.data);
-        setFormName("");
-        setFormEmail("");
-        setFormDoa(new Date());
-        setFormAboutYou("");
-        setFormReasonForApplying("");
-        setFormKnowAboutPavers("");
-        setFormProfilePicture("");
-      })
-      .catch((error) => {
-        console.log(error);
+    if (validateForm() && hasError) {
+      setSubmitForm({
+        applicantName: formName,
+        applicantEmail: formEmail,
+        dateOfApplication: formDoa,
+        aboutYou: formAboutYou,
+        reasonForApplying: formReasonForApplying,
+        whatYouKnowAboutPavers: formKnowAboutPavers,
+        file: formProfilePicture,
       });
+
+      axios
+        .post(
+          "https://staging.interview-api.paversdev.co.uk/upload",
+          submitForm
+        )
+        .then((res) => {
+          console.log(res.data);
+          setFormName("");
+          setFormEmail("");
+          setFormDoa(moment().format("MMMM Do YY"));
+          setFormAboutYou("");
+          setFormReasonForApplying("");
+          setFormKnowAboutPavers("");
+          setFormProfilePicture("");
+          setHasError(false);
+          setValidated(false);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
+  };
+
+  const handleProfilePicture = (e) => {
+    // preview profile picture and put into a URL.createObjectURL?
+    // https://medium.com/@650egor/react-30-day-challenge-day-2-image-upload-preview-2d534f8eaaa
   };
 
   return (
-    <Form onSubmit={handleOnSubmit}>
+    <Form noValidate validated={validated} onSubmit={handleOnSubmit}>
       <Form.Group className="mb-3" controlId="formBasicName">
         <Form.Label>Name</Form.Label>
         <Form.Control
@@ -57,6 +103,10 @@ const ContactForm = ({ handleSubmit }) => {
           value={formName}
           onChange={(e) => setFormName(e.target.value)}
         />
+        <Form.Control.Feedback>Looks Good!</Form.Control.Feedback>
+        <Form.Control.Feedback type="invalid">
+          Please enter your name.
+        </Form.Control.Feedback>
       </Form.Group>
       <Form.Group className="mb-3" controlId="formBasicEmail">
         <Form.Label>Email address</Form.Label>
@@ -67,6 +117,10 @@ const ContactForm = ({ handleSubmit }) => {
           value={formEmail}
           onChange={(e) => setFormEmail(e.target.value)}
         />
+        <Form.Control.Feedback>Looks good!</Form.Control.Feedback>
+        <Form.Control.Feedback type="invalid">
+          Please enter your email address.
+        </Form.Control.Feedback>
       </Form.Group>
       <Form.Group className="mb-3" controlId="formBasicDate">
         <Form.Label>Date of Application</Form.Label>
@@ -77,6 +131,10 @@ const ContactForm = ({ handleSubmit }) => {
           value={formDoa}
           onChange={(e) => setFormDoa(e.target.value)}
         />
+        <Form.Control.Feedback>Looks Good!</Form.Control.Feedback>
+        <Form.Control.Feedback type="invalid">
+          Please enter a valid Date.
+        </Form.Control.Feedback>
       </Form.Group>
       <Form.Group className="mb-3" controlId="formAboutYou">
         <Form.Label>About you</Form.Label>
@@ -84,6 +142,8 @@ const ContactForm = ({ handleSubmit }) => {
           required
           type="text"
           value={formAboutYou}
+          as="textarea"
+          rows={3}
           onChange={(e) => setFormAboutYou(e.target.value)}
         />
       </Form.Group>
@@ -92,6 +152,8 @@ const ContactForm = ({ handleSubmit }) => {
         <Form.Control
           required
           type="text"
+          as="textarea"
+          rows={3}
           value={formReasonForApplying}
           onChange={(e) => setFormReasonForApplying(e.target.value)}
         />
@@ -101,13 +163,19 @@ const ContactForm = ({ handleSubmit }) => {
         <Form.Control
           required
           type="text"
+          as="textarea"
+          rows={3}
           value={formKnowAboutPavers}
           onChange={(e) => setFormKnowAboutPavers(e.target.value)}
         />
       </Form.Group>
       <Form.Group controlId="formFile" className="mb-3">
-        <Form.Label>Default file input example</Form.Label>
-        <Form.Control type="file" />
+        <Form.Label>Upload profile picture</Form.Label>
+        <Form.Control
+          type="file"
+          accept="image/*"
+          onChange={(e) => setFormProfilePicture(e.target.files[0])}
+        />
       </Form.Group>
       <Button variant="primary" type="submit">
         Submit
