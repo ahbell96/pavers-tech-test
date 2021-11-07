@@ -7,11 +7,10 @@ import moment from "moment";
 const ContactForm = () => {
   // have a validated state
   const [error, setError] = useState("");
-  const [hasError, setHasError] = useState(false);
   const [validated, setValidated] = useState(false);
   const [formName, setFormName] = useState("");
   const [formEmail, setFormEmail] = useState("");
-  const [formDoa, setFormDoa] = useState(moment().format("MMMM Do YY"));
+  const [formDoa, setFormDoa] = useState(0);
   const [formAboutYou, setFormAboutYou] = useState("");
   const [formReasonForApplying, setFormReasonForApplying] = useState("");
   const [formKnowAboutPavers, setFormKnowAboutPavers] = useState("");
@@ -19,29 +18,22 @@ const ContactForm = () => {
   const [submitForm, setSubmitForm] = useState({});
 
   const validateForm = () => {
-    const baseDate = new Date();
-    if (formName.length <= 0) {
-      setHasError(true);
+    if (formName.length === 0) {
       return false;
     }
-    if (formEmail.length <= 0) {
-      setHasError(true);
+    if (formEmail.length === 0) {
       return false;
     }
-    if (formDoa.length === baseDate) {
-      setHasError(true);
+    if (!formDoa) {
       return false;
     }
-    if (formAboutYou.length <= 0) {
-      setHasError(true);
+    if (formAboutYou.length === 0) {
       return false;
     }
-    if (formReasonForApplying.length <= 0) {
-      setHasError(true);
+    if (formReasonForApplying.length === 0) {
       return false;
     }
-    if (formKnowAboutPavers.length <= 0) {
-      setHasError(true);
+    if (formKnowAboutPavers.length === 0) {
       return false;
     }
 
@@ -52,8 +44,9 @@ const ContactForm = () => {
     event.preventDefault();
     event.stopPropagation();
     setValidated(true);
+    console.log("hello");
 
-    if (validateForm() && hasError) {
+    if (validateForm()) {
       setSubmitForm({
         applicantName: formName,
         applicantEmail: formEmail,
@@ -64,6 +57,8 @@ const ContactForm = () => {
         file: formProfilePicture,
       });
 
+      console.log("hello 2");
+
       axios
         .post(
           "https://staging.interview-api.paversdev.co.uk/upload",
@@ -73,13 +68,13 @@ const ContactForm = () => {
           console.log(res.data);
           setFormName("");
           setFormEmail("");
-          setFormDoa(moment().format("MMMM Do YY"));
+          setFormDoa(0);
           setFormAboutYou("");
           setFormReasonForApplying("");
           setFormKnowAboutPavers("");
           setFormProfilePicture("");
-          setHasError(false);
           setValidated(false);
+          setSubmitForm({});
         })
         .catch((error) => {
           console.log(error);
