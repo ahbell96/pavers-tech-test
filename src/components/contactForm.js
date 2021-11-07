@@ -2,11 +2,9 @@ import { useState } from "react";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import axios from "axios";
-import moment from "moment";
 
 const ContactForm = () => {
   // have a validated state
-  const [error, setError] = useState("");
   const [validated, setValidated] = useState(false);
   const [formName, setFormName] = useState("");
   const [formEmail, setFormEmail] = useState("");
@@ -44,7 +42,6 @@ const ContactForm = () => {
     event.preventDefault();
     event.stopPropagation();
     setValidated(true);
-    console.log("hello");
 
     if (validateForm()) {
       setSubmitForm({
@@ -56,8 +53,6 @@ const ContactForm = () => {
         whatYouKnowAboutPavers: formKnowAboutPavers,
         file: formProfilePicture,
       });
-
-      console.log("hello 2");
 
       axios
         .post(
@@ -94,6 +89,7 @@ const ContactForm = () => {
         <Form.Control
           required
           type="text"
+          maxLength="50"
           placeholder="Enter name"
           value={formName}
           onChange={(e) => setFormName(e.target.value)}
@@ -108,6 +104,7 @@ const ContactForm = () => {
         <Form.Control
           required
           type="email"
+          maxLength="100"
           placeholder="Enter email"
           value={formEmail}
           onChange={(e) => setFormEmail(e.target.value)}
@@ -136,11 +133,16 @@ const ContactForm = () => {
         <Form.Control
           required
           type="text"
+          maxLength="255"
           value={formAboutYou}
           as="textarea"
           rows={3}
           onChange={(e) => setFormAboutYou(e.target.value)}
         />
+        <Form.Control.Feedback>Looks Good!</Form.Control.Feedback>
+        <Form.Control.Feedback type="invalid">
+          Please enter something about you.
+        </Form.Control.Feedback>
       </Form.Group>
       <Form.Group className="mb-3" controlId="formReasonApplying">
         <Form.Label>Reason for applying</Form.Label>
@@ -148,10 +150,15 @@ const ContactForm = () => {
           required
           type="text"
           as="textarea"
+          maxLength="255"
           rows={3}
           value={formReasonForApplying}
           onChange={(e) => setFormReasonForApplying(e.target.value)}
         />
+        <Form.Control.Feedback>Looks Good!</Form.Control.Feedback>
+        <Form.Control.Feedback type="invalid">
+          Please enter your reason for applying.
+        </Form.Control.Feedback>
       </Form.Group>
       <Form.Group className="mb-3" controlId="formDoYouKnowPavers">
         <Form.Label>What do you know about Pavers Ltd?</Form.Label>
@@ -159,10 +166,15 @@ const ContactForm = () => {
           required
           type="text"
           as="textarea"
+          maxLength="255"
           rows={3}
           value={formKnowAboutPavers}
           onChange={(e) => setFormKnowAboutPavers(e.target.value)}
         />
+        <Form.Control.Feedback>Looks Good!</Form.Control.Feedback>
+        <Form.Control.Feedback type="invalid">
+          Please let us know how you found out about Pavers.
+        </Form.Control.Feedback>
       </Form.Group>
       <Form.Group controlId="formFile" className="mb-3">
         <Form.Label>Upload profile picture</Form.Label>
