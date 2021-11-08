@@ -1,7 +1,19 @@
 @import "~bootstrap/scss/bootstrap";
 
+* {
+  font-family: "Roboto", sans-serif;
+}
+
 .App {
   text-align: center;
+}
+
+.landing-overlay {
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 2;
+  min-height: 100%;
+  width: 100%;
+  position: absolute;
 }
 
 .App-logo {
